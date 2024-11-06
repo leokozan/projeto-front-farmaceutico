@@ -38,7 +38,7 @@ function LoginPage() {
   return (
     <Grid container>
       <Grid  size={12}>
-        <Box padding={4} boxShadow={1} display={'flex'} flexDirection={'column'} alignItems={'center'}>
+        <Box padding={4} boxShadow={1} display={'flex'} flexDirection={'column'} alignItems={'center'} bgcolor={'white'}>
             <Typography variant="h5" component="h1" sx={{ marginBottom: 3 }}>
             Login - Farma
             </Typography>

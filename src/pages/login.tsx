@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { TextField, Button, Typography, Box, Alert } from '@mui/material';
 import { User } from '../models/models';
 import Grid from '@mui/material/Grid2';
+import { useNavigate } from 'react-router-dom';
 
-function LoginPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>(''); // Estado para armazenar a mensagem de erro
+  const [error, setError] = useState<string>('');
+  const navigate = useNavigate();
 
   const users: User[] = [
     {
@@ -28,16 +30,16 @@ function LoginPage() {
     }
     const user = users.find((u) => u.email === email && u.password === password);
     if (user) {
-      alert(`Login bem-sucedido! Cargo: ${user.cargo}`);
-      setError(''); // Limpa qualquer erro anterior ao fazer login com sucesso
+      navigate('/farmaceutico');
+      setError('');
     } else {
       setError('Usuário ou senha inválidos.');
     }
   };
 
   return (
-    <Grid container>
-      <Grid  size={12}>
+    <Grid container sx={{height:'100vh'}}>
+      <Grid size={12} display={'flex'} justifyContent={'center'} alignItems={'center'}>
         <Box padding={4} boxShadow={1} display={'flex'} flexDirection={'column'} alignItems={'center'} bgcolor={'white'}>
             <Typography variant="h5" component="h1" sx={{ marginBottom: 3 }}>
             Login - Farma
@@ -88,5 +90,3 @@ function LoginPage() {
     </Grid>
   );
 }
-
-export default LoginPage;

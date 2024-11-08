@@ -1,11 +1,35 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid2, Typography } from '@mui/material';
-import { Receita } from '../../models/models';
+import { DialogType, Receita } from '../../models/models';
+import { GenericDialog } from '../../components/Dialog';
 
 interface ReceitaFormProps {
 }
 
 const ReceitaForm: React.FC<ReceitaFormProps> = ({  }) => {
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogType, setDialogType] = useState<DialogType>('create'); // Por padrão, é "create"
+    const [itemName, setItemName] = useState<string>('Item Exemplo');
+  
+    const handleOpenDialog = (type: DialogType, name: string = 'Item Exemplo') => {
+      setDialogType(type);
+      setItemName(name);
+      setOpenDialog(true);
+    };
+  
+    const handleCloseDialog = () => {
+      setOpenDialog(false);
+    };
+    const handleConfirmAction = () => {
+        // Dependendo do tipo, você pode adicionar lógica diferente aqui
+        if (dialogType === 'delete') {
+          console.log(`Item ${itemName} deletado!`);
+        } else if (dialogType === 'update') {
+          console.log(`Item ${itemName} atualizado!`);
+        } else if (dialogType === 'create') {
+          console.log('Novo item criado!');
+        }
+      };
     const [formData, setFormData] = useState<Receita>({
     paciente: {
       nome: '',
@@ -172,10 +196,18 @@ const ReceitaForm: React.FC<ReceitaFormProps> = ({  }) => {
 
         {/* Botão de Submit */}
         <Grid2 size={{xs:12}}>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+          <Button type="submit" variant="contained" color="primary" onClick={()=>handleOpenDialog('create')} fullWidth>
             Criar Receita
           </Button>
         </Grid2>
+
+      <GenericDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmAction}
+        type={dialogType}
+        itemName={itemName}
+      />
       </Grid2>
     </form>
   );

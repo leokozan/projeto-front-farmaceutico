@@ -30,3 +30,5 @@ export type Receita = {
     medico:Medico,
     medicamento:Medicamento
 }
+
+export type DialogType = 'create' | 'update' | 'delete';

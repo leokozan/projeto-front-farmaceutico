@@ -10,11 +10,10 @@ const LayoutMedico = () => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Meu App
           </Typography>
-          <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/about">Sobre</Button>
+          <Button color="inherit" component={Link} to="/medico">Home</Button>
+          <Button color="inherit" component={Link} to="/medico/receita/create">Criar receita</Button>
         </Toolbar>
       </AppBar>
-
       {/* Main Content */}
       <Container sx={{ marginTop: 3 }}>
         <Outlet /> {/* O conteúdo da página será renderizado aqui */}

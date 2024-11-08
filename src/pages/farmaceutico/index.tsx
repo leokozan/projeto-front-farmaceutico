@@ -4,7 +4,7 @@ export default function Index(){
     return(
         <Box>
             <Typography>
-                Testando farmaceutico
+                Página farmácia
             </Typography>
         </Box>
     )

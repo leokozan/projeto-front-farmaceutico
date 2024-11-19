@@ -8,8 +8,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const navigate = useNavigate();
+  const url = import.meta.env.VITE_REACT_APP_API_URL;
+  console.log(url);
 
+  const navigate = useNavigate();
   const users: User[] = [
     {
       email: 'medico@farma.com',

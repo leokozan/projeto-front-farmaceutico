@@ -1,94 +1,226 @@
-import  { useState } from 'react';
-import { TextField, Button, Typography, Box, Alert } from '@mui/material';
-import { User } from '../models/models';
-import Grid from '@mui/material/Grid2';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { 
+  Button, 
+  TextField, 
+  Container, 
+  Typography, 
+  Box, 
+  Paper, 
+  Link, 
+  IconButton, 
+  InputAdornment
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const url = import.meta.env.VITE_REACT_APP_API_URL;
-  console.log(url);
+interface LoginProps {
+  onToggleView: () => void;
+}
 
-  const navigate = useNavigate();
-  const users: User[] = [
-    {
-      email: 'medico@farma.com',
-      password: 'admin123',
-      cargo: 'medico',
-    },
-    {
-      email: 'farmaceutico@farma.com',
-      password: 'func123',
-      cargo: 'farmaceutico',
-    },
-  ];
+interface RegisterProps {
+  onToggleView: () => void;
+}
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      setError('Por favor, preencha todos os campos.');
+export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Tentativa de login:', { email, password });
+  };
+  const handleApi = () =>{
+    const api = import.meta.env.VITE_REACT_APP_API_URL;
+    console.log(api);
+  }
+
+  return (
+    <Container 
+      maxWidth="xs" 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 400 }}>
+        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>
+          Entrar
+        </Typography>
+        <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Senha"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            onClick={handleApi}
+          >
+            Entrar
+          </Button>
+          <Typography variant="body2" align="center">
+            Não tem uma conta? 
+            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>
+              Cadastre-se
+            </Link>
+          </Typography>
+        </Box>
+      </Paper>
+    </Container>
+  );
+};
+
+export const Register: React.FC<RegisterProps> = ({ onToggleView }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      console.error('As senhas não correspondem');
       return;
     }
-    const user = users.find((u) => u.email === email && u.password === password);
-    if (user) {
-      navigate('/farmaceutico');
-      setError('');
-    } else {
-      setError('Usuário ou senha inválidos.');
-    }
+    console.log('Tentativa de cadastro:', { name, email, password });
   };
 
   return (
-    <Grid container sx={{height:'100vh'}}>
-      <Grid size={12} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-        <Box padding={4} boxShadow={1} display={'flex'} flexDirection={'column'} alignItems={'center'} bgcolor={'white'}>
-            <Typography variant="h5" component="h1" sx={{ marginBottom: 3 }}>
-            Login - Farma
-            </Typography>
-            <Box>
-            {error && (
-                <Alert severity="error" sx={{ marginTop: 2}}>
-                {error}
-                </Alert>
-            )}
-            <TextField
-                label="Email"
-                type="email"
-                variant="outlined"
-                fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                margin="normal"
-                required
-            />
-            <TextField
-                label="Senha"
-                type="password"
-                variant="outlined"
-                fullWidth
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                margin="normal"
-                required
-            />
-            <Button
-                variant="contained"
-                fullWidth
-                sx={{ marginTop: 2 }}
-                color="primary"
-                onClick={handleLogin}
-            >
-                Entrar
-            </Button>
-            </Box>
-            <Grid size={12}>
-            <Typography variant="body2">
-                Esqueceu a senha?
-            </Typography>
-            </Grid>
+    <Container 
+      maxWidth="xs" 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 400 }}>
+        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>
+          Cadastro
+        </Typography>
+        <Box component="form" onSubmit={handleRegister} sx={{ width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Nome Completo"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Senha"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Confirmar Senha"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Cadastrar
+          </Button>
+          <Typography variant="body2" align="center">
+            Já tem uma conta? 
+            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>
+              Entrar
+            </Link>
+          </Typography>
         </Box>
-      </Grid>
-    </Grid>
+      </Paper>
+    </Container>
   );
-}
+};
+
+export const AuthContainer: React.FC = () => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  const toggleView = () => {
+    setIsLogin(!isLogin);
+  };
+
+  return isLogin 
+    ? <Login onToggleView={toggleView} /> 
+    : <Register onToggleView={toggleView} />;
+};
+
+export default AuthContainer;

@@ -8,9 +8,13 @@ import {
   Paper, 
   Link, 
   IconButton, 
-  InputAdornment
+  InputAdornment,
+  FormControlLabel,
+  Checkbox,
+  FormGroup
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios';
 
 interface LoginProps {
   onToggleView: () => void;
@@ -21,33 +25,29 @@ interface RegisterProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [login, setEmail] = useState('');
+  const [senha, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Tentativa de login:', { email, password });
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/login`, {
+        login,
+        senha
+      });
+      localStorage.setItem('token', response.data.token);
+      window.location.href = '/dashboard'; 
+    } catch (error) {
+      setError('Credenciais inválidas. Tente novamente.');
+    }
   };
-  const handleApi = () =>{
-    const api = import.meta.env.VITE_REACT_APP_API_URL;
-    console.log(api);
-  }
 
   return (
-    <Container 
-      maxWidth="xs" 
-      sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}
-    >
+    <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 400 }}>
-        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>
-          Entrar
-        </Typography>
+        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>Entrar</Typography>
         <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
           <TextField
             margin="normal"
@@ -55,7 +55,7 @@ export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
             fullWidth
             label="E-mail"
             type="email"
-            value={email}
+            value={login}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -64,89 +64,69 @@ export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
             fullWidth
             label="Senha"
             type={showPassword ? 'text' : 'password'}
-            value={password}
+            value={senha}
             onChange={(e) => setPassword(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               )
             }}
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            onClick={handleApi}
-          >
-            Entrar
-          </Button>
+          {error && <Typography color="error" variant="body2" align="center">{error}</Typography>}
+          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>Entrar</Button>
           <Typography variant="body2" align="center">
             Não tem uma conta? 
-            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>
-              Cadastre-se
-            </Link>
+            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>Cadastre-se</Link>
           </Typography>
         </Box>
       </Paper>
     </Container>
   );
 };
-
 export const Register: React.FC<RegisterProps> = ({ onToggleView }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [login, setEmail] = useState('');
+  const [senha, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
+  const [isPharmacist, setIsPharmacist] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      console.error('As senhas não correspondem');
+    if (senha !== confirmPassword) {
+      setError('As senhas não correspondem');
       return;
     }
-    console.log('Tentativa de cadastro:', { name, email, password });
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/register`, {
+        login,
+        senha,
+        role: isDoctor ? 'Médico' : isPharmacist ? 'Farmacêutico' : 'Não especificado'
+      });
+      console.log(response.data);
+    } catch (error) {
+      setError('Erro ao registrar. Tente novamente.');
+    }
   };
 
   return (
-    <Container 
-      maxWidth="xs" 
-      sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}
-    >
+    <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 400 }}>
-        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>
-          Cadastro
-        </Typography>
+        <Typography component="h1" variant="h5" align="center" sx={{ mb: 2 }}>Cadastro</Typography>
         <Box component="form" onSubmit={handleRegister} sx={{ width: '100%' }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Nome Completo"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
           <TextField
             margin="normal"
             required
             fullWidth
             label="E-mail"
             type="email"
-            value={email}
+            value={login}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -155,15 +135,12 @@ export const Register: React.FC<RegisterProps> = ({ onToggleView }) => {
             fullWidth
             label="Senha"
             type={showPassword ? 'text' : 'password'}
-            value={password}
+            value={senha}
             onChange={(e) => setPassword(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -181,35 +158,37 @@ export const Register: React.FC<RegisterProps> = ({ onToggleView }) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    edge="end"
-                  >
+                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
                     {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               )
             }}
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
+          {error && <Typography color="error" variant="body2" align="center">{error}</Typography>}
+          <FormGroup sx={{ mt: 2 }}>
+            <FormControlLabel
+              control={<Checkbox checked={isDoctor} onChange={() => setIsDoctor(!isDoctor)} />}
+              label="Médico"
+            />
+            <FormControlLabel
+              control={<Checkbox checked={isPharmacist} onChange={() => setIsPharmacist(!isPharmacist)} />}
+              label="Farmacêutico"
+            />
+          </FormGroup>
+          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Cadastrar
           </Button>
           <Typography variant="body2" align="center">
             Já tem uma conta? 
-            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>
-              Entrar
-            </Link>
+            <Link href="#" onClick={onToggleView} sx={{ ml: 1 }}>Entrar</Link>
           </Typography>
         </Box>
       </Paper>
     </Container>
   );
 };
+
 
 export const AuthContainer: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);

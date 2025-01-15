@@ -37,8 +37,8 @@ export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
         login,
         senha
       });
-      localStorage.setItem('token', response.data.token);
-      window.location.href = '/dashboard'; 
+      // localStorage.setItem('token', response.data.token);
+      // window.location.href = '/dashboard'; 
     } catch (error) {
       setError('Credenciais inválidas. Tente novamente.');
     }

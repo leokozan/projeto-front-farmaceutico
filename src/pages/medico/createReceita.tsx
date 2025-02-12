@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Grid } from '@mui/material';
+import { TextField, Button, Typography, Grid, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ReceitaForm: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,14 @@ const ReceitaForm: React.FC = () => {
     observacoes: ''
   });
 
+  const [loginData, setLoginData] = useState({
+    login: '',
+    senha: ''
+  });
+
+  const [openLoginModal, setOpenLoginModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -26,17 +35,51 @@ const ReceitaForm: React.FC = () => {
     }));
   };
 
-  // Envia os dados para o backend
+  const handleLoginChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setLoginData({
+      ...loginData,
+      [name]: value
+    });
+  };
+
+  const handleLoginSubmit = () => {
+    axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/login`, loginData)
+      .then((response) => {
+        console.log(response);
+        if (response.data.role) {
+          const role = response.data.role;
+          if (role === 'MEDICO') {
+            setIsAuthenticated(true);
+            setOpenLoginModal(false);
+            alert('Login realizado com sucesso!');
+          } else {
+            alert('Usuário não é um farmacêutico!');
+          }
+        } else {
+          alert('Credenciais inválidas');
+        }
+      })
+      .catch((error) => {
+        console.error('Erro de login:', error);
+        alert('Erro ao tentar fazer login');
+      });
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
-    const token = localStorage.getItem('token'); // Obter o token do localStorage
     event.preventDefault();
+
+    // Verificar se o usuário está autenticado antes de enviar os dados da receita
+    if (!isAuthenticated) {
+      setOpenLoginModal(true);
+      return;
+    }
 
     try {
       const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/receitas/cadastrarReceita`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(formData)
       });
@@ -189,6 +232,40 @@ const ReceitaForm: React.FC = () => {
           </Button>
         </Grid>
       </Grid>
+
+      {/* Modal de Login */}
+      <Dialog open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
+        <DialogTitle>Login</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Usuário"
+            variant="outlined"
+            fullWidth
+            name="login"
+            value={loginData.login}
+            onChange={handleLoginChange}
+            margin="normal"
+          />
+          <TextField
+            label="Senha"
+            variant="outlined"
+            type="password"
+            fullWidth
+            name="senha"
+            value={loginData.senha}
+            onChange={handleLoginChange}
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLoginSubmit} color="primary">
+            Login
+          </Button>
+          <Button onClick={() => setOpenLoginModal(false)} color="secondary">
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 };

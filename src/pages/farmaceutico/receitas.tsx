@@ -56,11 +56,19 @@ const ReceitaTable = () => {
 
   const handleCloseLoginModal = () => {
     setOpenLoginModal(false);
+    setLoginData({
+      login:'',
+      senha:''
+    });
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedReceita(null);
+    setLoginData({
+      login:'',
+      senha:''
+    });
   };
 
   const handleLoginChange = (event) => {
@@ -72,14 +80,15 @@ const ReceitaTable = () => {
   };
 
   const handleLoginSubmit = () => {
-    axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/verificarEnfermeiro`, loginData)
+    axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/login`, loginData)
       .then((response) => {
-        if (response.data.token) {  // Verificando se o token foi retornado
-          const role = response.data.role; // Supondo que o backend retorne o papel na resposta
-          if (role === "FARMACEUTICO") { // Verifica se a role é FARMACEUTICO (assumido como enfermeiro)
-            setIsAuthenticated(true); // Define como autenticado
-            setOpenLoginModal(false); // Fecha o modal de login
-            setOpenModal(true); // Abre o modal de detalhes da receita
+        console.log(response)
+        if (response.data.role) { 
+          const role = response.data.role; 
+          if (role === "FARMACEUTICO") { 
+            setIsAuthenticated(true);
+            setOpenLoginModal(false);
+            setOpenModal(true);
           } else {
             alert("Usuário não é um enfermeiro!");
           }
@@ -93,11 +102,31 @@ const ReceitaTable = () => {
       });
   };
 
-  const handleDarBaixa = () => {
-    alert("Receita dada baixa com sucesso!");
-    handleCloseModal();
+  const handleDarBaixa = async (event: React.FormEvent) => {
+  
+    try {
+      // Definindo o ID da receita, isso pode vir de um estado ou prop
+      const receitaId = 1; // Substitua por seu id dinâmico, se necessário
+      
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/receitas/${receitaId}/baixada`, {
+        method: 'PUT', // Mudando para PUT, pois é uma atualização
+        headers: {
+          'Content-Type': 'application/json', // Para enviar JSON
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json(); // Caso a resposta seja JSON
+        alert("Receita dada baixa com sucesso!");
+        handleCloseModal(); // Fecha o modal após o sucesso
+      } else {
+        alert("Erro ao dar baixa na receita");
+      }
+    } catch (error) {
+      console.error("Erro ao dar baixa na receita:", error);
+      alert("Erro ao tentar dar baixa");
+    }
   };
-
   return (
     <div>
       {loading ? (
@@ -141,8 +170,8 @@ const ReceitaTable = () => {
             label="Usuário"
             variant="outlined"
             fullWidth
-            name="username"
-            value={loginData.username}
+            name="login"
+            value={loginData.login}
             onChange={handleLoginChange}
             margin="normal"
           />
@@ -151,8 +180,8 @@ const ReceitaTable = () => {
             variant="outlined"
             type="password"
             fullWidth
-            name="password"
-            value={loginData.password}
+            name="senha"
+            value={loginData.senha}
             onChange={handleLoginChange}
             margin="normal"
           />

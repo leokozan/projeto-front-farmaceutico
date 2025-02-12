@@ -1,7 +1,15 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
 
 const LayoutFarmaceutico = () => {
+  const navigate = useNavigate(); // Hook para navegação programática
+  
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role'); 
+
+    navigate('/');
+  };
   return (
     <Box>
       {/* Header */}
@@ -10,8 +18,9 @@ const LayoutFarmaceutico = () => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Meu App
           </Typography>
-          <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/about">Sobre</Button>
+          <Button color="inherit" component={Link} to="/farmaceutico">Home</Button>
+          <Button color="inherit" component={Link} to="/farmaceutico/receitas">Receitas</Button>
+          <Button color="inherit" onClick={handleLogout}>Sair</Button> {/* Botão de Logout */}
         </Toolbar>
       </AppBar>
 

@@ -1,7 +1,16 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
 
 const LayoutMedico = () => {
+  const navigate = useNavigate(); // Hook para navegação programática
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role'); 
+
+    navigate('/');
+  };
+
   return (
     <Box>
       {/* Header */}
@@ -12,8 +21,10 @@ const LayoutMedico = () => {
           </Typography>
           <Button color="inherit" component={Link} to="/medico">Home</Button>
           <Button color="inherit" component={Link} to="/medico/receita/create">Criar receita</Button>
+          <Button color="inherit" onClick={handleLogout}>Sair</Button> {/* Botão de Logout */}
         </Toolbar>
       </AppBar>
+
       {/* Main Content */}
       <Container sx={{ marginTop: 3 }}>
         <Outlet /> {/* O conteúdo da página será renderizado aqui */}

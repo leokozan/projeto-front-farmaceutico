@@ -13,8 +13,7 @@ export type Paciente = {
 
 export type Medico = {
     nome:string,
-    CRM:string,
-    assinatura_digital:any,
+    CRM:string
 }
 
 export type Medicamento = {

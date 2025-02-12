@@ -33,17 +33,37 @@ export const Login: React.FC<LoginProps> = ({ onToggleView }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/login`, {
-        login,
-        senha
-      });
-      // localStorage.setItem('token', response.data.token);
-      // window.location.href = '/dashboard'; 
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ login, senha })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role); // Guarda a role do usuário
+            navigateBasedOnRole(data.role); // Redireciona para a tela correta
+        } else {
+            setError("Credenciais inválidas. Tente novamente.");
+        }
     } catch (error) {
-      setError('Credenciais inválidas. Tente novamente.');
+        console.error("Erro no login:", error);
+        setError("Ocorreu um erro. Tente novamente.");
     }
   };
-
+const navigateBasedOnRole = (role: string) => {
+    if (role === "MEDICO") {
+        window.location.href = "/medico";
+    } else if (role === "FARMACEUTICO") {
+        window.location.href = "/farmaceutico";
+    } else {
+        window.location.href = "/login";
+    }
+};
   return (
     <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <Paper elevation={3} sx={{ padding: 3, width: '100%', maxWidth: 400 }}>
@@ -107,7 +127,7 @@ export const Register: React.FC<RegisterProps> = ({ onToggleView }) => {
       const response = await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/auth/register`, {
         login,
         senha,
-        role: isDoctor ? 'Médico' : isPharmacist ? 'Farmacêutico' : 'Não especificado'
+        roles: isDoctor ? 'MEDICO' : isPharmacist ? 'FARMACEUTICO' : 'USER'
       });
       console.log(response.data);
     } catch (error) {
